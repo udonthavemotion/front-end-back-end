@@ -1,0 +1,133 @@
+---
+import Container from "@/components/container.astro";
+import Cta from "@/components/cta.astro";
+import Features from "@/components/features.astro";
+import Hero from "@/components/hero.astro";
+import ImageShowcase from "@/components/imageShowcase.astro";
+import Logos from "@/components/logos.astro";
+import Layout from "@/layouts/Layout.astro";
+import { getHomepageContent, getStuds, getImageUrl, formatPrice, type Homepage, type Stud } from "@/lib/strapi";
+import { Icon } from "astro-icon/components";
+
+// Fetch homepage content and featured studs
+let homepageContent: Homepage | null = null;
+let featuredStuds: Stud[] = [];
+let error: string | null = null;
+
+try {
+  // Get homepage content
+  const homepageResponse = await getHomepageContent();
+  homepageContent = homepageResponse.data;
+  
+  // Get featured studs (available ones, limited to 3 for homepage)
+  const studsResponse = await getStuds({
+    populate: 'images',
+    filters: { availability: 'Available' },
+    sort: 'createdAt:desc',
+    pageSize: 3
+  });
+  featuredStuds = studsResponse.data;
+} catch (err) {
+  console.error('Error fetching homepage content:', err);
+  error = 'Some content may not be available';
+}
+---
+
+<Layout title="">
+  <Container>
+    <Hero homepageContent={homepageContent} />
+    <Features />
+    
+    <!-- Featured Studs Section - CMS Driven -->
+    <section class="py-16 bg-secondary">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="text-center mb-16">
+          <h2 class="font-heading text-4xl lg:text-5xl font-bold text-brand-navy mb-4">
+            {homepageContent?.featured_section_title || "Featured English Bulldogs"}
+          </h2>
+          
+          <div class="w-24 h-1 bg-gradient-to-r from-brand-blue to-brand-orange rounded-full mx-auto mb-6"></div>
+          
+          <p class="text-lg text-secondary max-w-3xl mx-auto leading-relaxed">
+            {homepageContent?.featured_section_description || "Discover our exceptional English Bulldogs featuring rare color genetics and quality breeding program. Each dog represents our commitment to excellence and innovation in breeding."}
+          </p>
+        </div>
+        
+        {featuredStuds.length > 0 ? (
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {featuredStuds.map((stud) => (
+              <div class="card hover:shadow-strong group">
+                <div class="relative overflow-hidden rounded-lg mb-4">
+                  <img 
+                    src={stud.images && stud.images.length > 0 ? getImageUrl(stud.images[0], 'medium') : 'https://placehold.co/400x300?text=Photo+Coming+Soon'}
+                    alt={stud.images && stud.images.length > 0 && stud.images[0].alternativeText ? stud.images[0].alternativeText : `${stud.name} stud`}
+                    loading="lazy"
+                    class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  
+                  <div class="absolute top-3 right-3">
+                    <span class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                      {stud.availability}
+                    </span>
+                  </div>
+                  
+                  <div class="absolute top-3 left-3">
+                    <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                      <Icon class="w-3 h-3" name="bx:bxs-crown" />
+                      Stud
+                    </span>
+                  </div>
+                </div>
+                
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between">
+                    <h3 class="font-heading font-semibold text-xl text-brand-navy">
+                      {stud.name}
+                    </h3>
+                    <span class="text-blue-600 font-bold text-lg">
+                      {formatPrice(stud.fee)}
+                    </span>
+                  </div>
+                  
+                  <p class="text-secondary leading-relaxed text-sm">
+                    {stud.description}
+                  </p>
+                  
+                  <div class="flex items-center gap-2 text-gray-600">
+                    <Icon class="w-4 h-4 text-blue-600" name="bx:bxs-calendar" />
+                    <span class="text-sm">{stud.age}</span>
+                  </div>
+                  
+                  <a 
+                    href={`/contact?stud=${encodeURIComponent(stud.name)}`}
+                    class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors"
+                  >
+                    <Icon class="w-4 h-4" name="bx:bxs-phone" />
+                    Contact for Breeding
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div class="text-center py-8">
+            <Icon class="w-16 h-16 text-gray-400 mx-auto mb-4" name="bx:bxs-dog" />
+            <p class="text-gray-600">No featured studs available at the moment.</p>
+          </div>
+        )}
+        
+        <div class="mt-12 text-center">
+          <a href="/studs" class="cta-primary">
+            <Icon class="w-5 h-5 mr-2" name="bx:bxs-crown" />
+            View All Champion Studs
+          </a>
+        </div>
+      </div>
+    </section>
+    
+    <ImageShowcase />
+    <Logos />
+    <Cta />
+  </Container>
+</Layout>
