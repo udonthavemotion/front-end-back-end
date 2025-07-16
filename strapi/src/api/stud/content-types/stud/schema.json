@@ -1,0 +1,51 @@
+{
+  "kind": "collectionType",
+  "collectionName": "studs",
+  "info": {
+    "singularName": "stud",
+    "pluralName": "studs",
+    "displayName": "stud"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "age": {
+      "type": "string"
+    },
+    "price": {
+      "type": "integer"
+    },
+    "descriptoion": {
+      "type": "blocks"
+    },
+    "bloodlines": {
+      "type": "string"
+    },
+    "specialties": {
+      "type": "string"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "availability": {
+      "type": "enumeration",
+      "enum": [
+        "Available",
+        "Busy",
+        "Reserved"
+      ]
+    }
+  }
+}
