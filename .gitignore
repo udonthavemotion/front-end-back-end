@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Build outputs
+dist/
+.astro/
+
+# Strapi
+strapi/build/
+strapi/.cache/
+strapi/.tmp/
+strapi/public/uploads/
+
+# OS
+.DS_Store
+Thumbs.db
