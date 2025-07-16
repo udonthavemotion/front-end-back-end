@@ -72,6 +72,19 @@ export interface Stud {
   publishedAt: string;
 }
 
+export interface Homepage {
+  id: number;
+  hero_headline: string;
+  hero_subheadline: string;
+  hero_video: StrapiImage;
+  hero_poster_image: StrapiImage;
+  featured_section_title: string;
+  featured_section_description: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+}
+
 // API Service Class
 class StrapiService {
   private baseURL: string;
@@ -205,6 +218,11 @@ class StrapiService {
     });
   }
 
+  // Homepage operations
+  async getHomepageContent(): Promise<StrapiResponse<Homepage>> {
+    return this.request<Homepage>('/homepage?populate=*');
+  }
+
   // Utility methods
   getImageUrl(image: StrapiImage, size: 'thumbnail' | 'small' | 'medium' | 'large' = 'medium'): string {
     if (image.formats && image.formats[size]) {
@@ -245,6 +263,8 @@ export const getStud = (id: number, populate?: string) =>
   strapiService.getStud(id, populate);
 export const getAvailableStuds = () => 
   strapiService.getAvailableStuds();
+export const getHomepageContent = () => 
+  strapiService.getHomepageContent();
 export const getImageUrl = (image: StrapiImage, size?: 'thumbnail' | 'small' | 'medium' | 'large') => 
   strapiService.getImageUrl(image, size);
 export const formatPrice = (price: number) => 
